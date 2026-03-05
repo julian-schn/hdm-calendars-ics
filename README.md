@@ -6,11 +6,11 @@ Automatically crawls [HdM Stuttgart](https://www.hdm-stuttgart.de) calendar page
 
 ## 📅 Subscribe
 
-| Calendar | Language | Subscribe |
-|----------|----------|-----------|
-| HdM Terminkalender | 🇩🇪 DE | `https://julian-schn.github.io/hdm-calendars-ics/hdm-termine.ics` |
-| HdM Akademischer Kalender | 🇩🇪 DE | `https://julian-schn.github.io/hdm-calendars-ics/hdm-akademisch.ics` |
-| HdM Academic Calendar | 🇬🇧 EN | `https://julian-schn.github.io/hdm-calendars-ics/hdm-academic-en.ics` |
+| Calendar | Language | Details | Subscribe |
+|----------|----------|---------|-----------|
+| HdM Terminkalender | 🇩🇪 DE | Detailed — includes times, locations, and descriptions | `https://julian-schn.github.io/hdm-calendars-ics/hdm-termine.ics` |
+| HdM Akademischer Kalender | 🇩🇪 DE | Overview — semester milestones and key dates only | `https://julian-schn.github.io/hdm-calendars-ics/hdm-akademisch.ics` |
+| HdM Academic Calendar | 🇬🇧 EN | Overview — semester milestones and key dates only | `https://julian-schn.github.io/hdm-calendars-ics/hdm-academic-en.ics` |
 
 > Copy the URL and add it as a "subscription" / "From URL" calendar in Google Calendar, Apple Calendar, or Outlook.
 
