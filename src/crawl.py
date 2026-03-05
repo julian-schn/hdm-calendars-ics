@@ -92,24 +92,27 @@ def parse_date_text(text: str, language: str) -> tuple[date, Optional[date]]:
     - "17. - 20. März 2026"
     - "March 17, 2026"
     """
-    text = text.strip()
+    text = re.sub(r"\s+", " ", text.strip()).replace("–", "-").replace("—", "-")
+    month_pattern = r"([A-Za-zÄÖÜäöüß]+)\.?"
 
     # Try "DD.MM.YYYY" numeric format
-    numeric = re.match(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", text)
-    if numeric:
-        d, m, y = int(numeric.group(1)), int(numeric.group(2)), int(numeric.group(3))
-        start = date(y, m, d)
-        # Check for " - DD.MM.YYYY" range
-        range_match = re.search(r"-\s*(\d{1,2})\.(\d{1,2})\.(\d{4})", text)
-        end = None
-        if range_match:
-            d2, m2, y2 = int(range_match.group(1)), int(range_match.group(2)), int(range_match.group(3))
-            end = date(y2, m2, d2)
-        return start, end
+    numeric_range = re.fullmatch(
+        r"(\d{1,2})\.(\d{1,2})\.(\d{4})\s*-\s*(\d{1,2})\.(\d{1,2})\.(\d{4})",
+        text
+    )
+    if numeric_range:
+        d1, m1, y1 = int(numeric_range.group(1)), int(numeric_range.group(2)), int(numeric_range.group(3))
+        d2, m2, y2 = int(numeric_range.group(4)), int(numeric_range.group(5)), int(numeric_range.group(6))
+        return date(y1, m1, d1), date(y2, m2, d2)
+
+    numeric_single = re.fullmatch(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", text)
+    if numeric_single:
+        d, m, y = int(numeric_single.group(1)), int(numeric_single.group(2)), int(numeric_single.group(3))
+        return date(y, m, d), None
 
     # Try "DD. Month YYYY - DD. Month YYYY" range with full months
-    range_full = re.match(
-        r"(\d{1,2})\.\s*(\w+)\s+(\d{4})\s*-\s*(\d{1,2})\.\s*(\w+)\s+(\d{4})",
+    range_full = re.fullmatch(
+        rf"(\d{{1,2}})\.\s*{month_pattern}\s+(\d{{4}})\s*-\s*(\d{{1,2}})\.\s*{month_pattern}\s+(\d{{4}})",
         text
     )
     if range_full:
@@ -121,9 +124,26 @@ def parse_date_text(text: str, language: str) -> tuple[date, Optional[date]]:
         y2 = int(range_full.group(6))
         return date(y1, m1, d1), date(y2, m2, d2)
 
+    # Try "DD. Month - DD. Month YYYY" range with one year (German)
+    range_cross_month = re.fullmatch(
+        rf"(\d{{1,2}})\.\s*{month_pattern}\s*-\s*(\d{{1,2}})\.\s*{month_pattern}\s+(\d{{4}})",
+        text
+    )
+    if range_cross_month:
+        d1 = int(range_cross_month.group(1))
+        m1 = parse_month(range_cross_month.group(2), language)
+        d2 = int(range_cross_month.group(3))
+        m2 = parse_month(range_cross_month.group(4), language)
+        y = int(range_cross_month.group(5))
+        start = date(y, m1, d1)
+        end = date(y, m2, d2)
+        if end < start:
+            end = date(y + 1, m2, d2)
+        return start, end
+
     # Try "DD. - DD. Month YYYY" short range (same month)
-    range_short = re.match(
-        r"(\d{1,2})\.\s*-\s*(\d{1,2})\.\s*(\w+)\s+(\d{4})",
+    range_short = re.fullmatch(
+        rf"(\d{{1,2}})\.\s*-\s*(\d{{1,2}})\.\s*{month_pattern}\s+(\d{{4}})",
         text
     )
     if range_short:
@@ -134,15 +154,41 @@ def parse_date_text(text: str, language: str) -> tuple[date, Optional[date]]:
         return date(y, m, d1), date(y, m, d2)
 
     # Try "DD. Month YYYY" single date (German)
-    single_de = re.match(r"(\d{1,2})\.\s*(\w+)\s+(\d{4})", text)
+    single_de = re.fullmatch(rf"(\d{{1,2}})\.\s*{month_pattern}\s+(\d{{4}})", text)
     if single_de:
         d = int(single_de.group(1))
         m = parse_month(single_de.group(2), language)
         y = int(single_de.group(3))
         return date(y, m, d), None
 
+    # Try "Month DD, YYYY - Month DD, YYYY" range (English)
+    range_en_full = re.fullmatch(
+        rf"{month_pattern}\s+(\d{{1,2}}),?\s+(\d{{4}})\s*-\s*{month_pattern}\s+(\d{{1,2}}),?\s+(\d{{4}})",
+        text
+    )
+    if range_en_full:
+        m1 = parse_month(range_en_full.group(1), language)
+        d1 = int(range_en_full.group(2))
+        y1 = int(range_en_full.group(3))
+        m2 = parse_month(range_en_full.group(4), language)
+        d2 = int(range_en_full.group(5))
+        y2 = int(range_en_full.group(6))
+        return date(y1, m1, d1), date(y2, m2, d2)
+
+    # Try "Month DD - DD, YYYY" short range (same month, English)
+    range_en_short = re.fullmatch(
+        rf"{month_pattern}\s+(\d{{1,2}})\s*-\s*(\d{{1,2}}),?\s+(\d{{4}})",
+        text
+    )
+    if range_en_short:
+        m = parse_month(range_en_short.group(1), language)
+        d1 = int(range_en_short.group(2))
+        d2 = int(range_en_short.group(3))
+        y = int(range_en_short.group(4))
+        return date(y, m, d1), date(y, m, d2)
+
     # Try "Month DD, YYYY" single date (English)
-    single_en = re.match(r"(\w+)\s+(\d{1,2}),?\s+(\d{4})", text)
+    single_en = re.fullmatch(rf"{month_pattern}\s+(\d{{1,2}}),?\s+(\d{{4}})", text)
     if single_en:
         m = parse_month(single_en.group(1), language)
         d = int(single_en.group(2))

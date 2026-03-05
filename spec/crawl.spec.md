@@ -48,6 +48,8 @@ A list of event dictionaries, each containing:
 - `17.03.2026` → `2026-03-17`
 - `17. - 20. März 2026` → start=17, end=20
 - `17. März - 03. Juli 2026` → date range across months
+- `01. Juli 2026 - 31. Juli 2026` → long multi-week range (e.g. examination period)
+- `March 17, 2026 - March 20, 2026` → English date range
 
 ## Error Handling
 - **HTTP errors:** Retry up to 3 times with exponential backoff (1s, 2s, 4s)
