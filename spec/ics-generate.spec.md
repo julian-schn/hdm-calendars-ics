@@ -37,7 +37,9 @@ X-WR-TIMEZONE:Europe/Berlin
 ## Rules
 
 1. **All-day events:** If no `time_start` is provided, create as all-day event (`VALUE=DATE`)
+   - For multi-day and multi-week all-day events (e.g. examination periods), `DTEND` is exclusive and must be `date_end + 1 day`
 2. **Timed events:** If `time_start` is provided, use `TZID=Europe/Berlin`
+   - If `time_end` is earlier than or equal to `time_start` on the same date, treat it as crossing midnight (end on next day)
 3. **UID generation:** `{date_start}-{slugified_title}@hdm-calendars-ics` — deterministic so repeated runs don't create duplicates
 4. **DTSTAMP:** Set to current UTC time at generation
 5. **Timezone:** Always Europe/Berlin (VTIMEZONE component included)

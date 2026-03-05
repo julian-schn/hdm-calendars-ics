@@ -8,7 +8,7 @@ following RFC 5545.
 import re
 from datetime import datetime, timedelta
 
-from icalendar import Calendar, Event as IcsEvent, vText
+from icalendar import Calendar, Event as IcsEvent
 
 from crawl import Event
 
@@ -63,6 +63,8 @@ def event_to_ics(event: Event) -> IcsEvent:
                 event.time_end.hour, event.time_end.minute,
                 tzinfo=BERLIN_TZ,
             )
+            if dt_end <= dt_start:
+                dt_end += timedelta(days=1)
             ics_event.add("dtend", dt_end)
         else:
             # Default: 1 hour duration
