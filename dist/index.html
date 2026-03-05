@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HdM Calendars – ICS Subscribe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 700px; margin: 2rem auto; padding: 0 1rem;
+            color: #1a1a1a; line-height: 1.6;
+        }
+        h1 { margin-bottom: 0.5rem; }
+        p { margin-bottom: 1.5rem; color: #555; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e0e0e0; }
+        th { background: #f5f5f5; font-weight: 600; }
+        a { color: #e2001a; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .hint {
+            margin-top: 2rem; padding: 1rem; background: #f0f7ff;
+            border-radius: 8px; font-size: 0.9rem; color: #333;
+        }
+        footer { margin-top: 2rem; font-size: 0.8rem; color: #999; }
+    </style>
+</head>
+<body>
+    <h1>📅 HdM Stuttgart Calendars</h1>
+    <p>Subscribable webcalendars generated from <a href="https://www.hdm-stuttgart.de">hdm-stuttgart.de</a>.</p>
+    <table>
+        <thead>
+            <tr><th>Calendar</th><th>Language</th><th>ICS File</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>HdM Termine</td>
+            <td>🇩🇪 DE</td>
+            <td><a href="hdm-termine.ics">hdm-termine.ics</a></td>
+        </tr>
+        <tr>
+            <td>HdM Akademischer Kalender</td>
+            <td>🇩🇪 DE</td>
+            <td><a href="hdm-akademisch.ics">hdm-akademisch.ics</a></td>
+        </tr>
+        <tr>
+            <td>HdM Academic Calendar</td>
+            <td>🇬🇧 EN</td>
+            <td><a href="hdm-academic-en.ics">hdm-academic-en.ics</a></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="hint">
+        <strong>How to subscribe:</strong> Copy the ICS link, then in your calendar app
+        (Google Calendar, Apple Calendar, Outlook), choose "Add calendar → From URL"
+        and paste the full URL.
+    </div>
+    <footer>Auto-updated daily via GitHub Actions. Source on
+        <a href="https://github.com/">GitHub</a>.
+    </footer>
+</body>
+</html>

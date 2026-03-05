@@ -1,0 +1,26 @@
+[
+  {
+    "name": "HdM Terminkalender",
+    "url": "https://www.hdm-stuttgart.de/hochschule/aktuelles/terminkalender/",
+    "output": "hdm-termine.ics",
+    "calendar_name": "HdM Termine",
+    "language": "de",
+    "follow_detail_links": true
+  },
+  {
+    "name": "HdM Akademischer Kalender",
+    "url": "https://www.hdm-stuttgart.de/vor-dem-studium/vorbereitung-auf-das-studium/studienstart-fuer-austauschstudierende/akademischer-kalender/",
+    "output": "hdm-akademisch.ics",
+    "calendar_name": "HdM Akademischer Kalender",
+    "language": "de",
+    "follow_detail_links": false
+  },
+  {
+    "name": "HdM Academic Calendar (EN)",
+    "url": "https://www.hdm-stuttgart.de/en/before-your-studies/preparation-for-your-studies/start-of-studies-for-exchange-students/academic-calendar/",
+    "output": "hdm-academic-en.ics",
+    "calendar_name": "HdM Academic Calendar",
+    "language": "en",
+    "follow_detail_links": false
+  }
+]
