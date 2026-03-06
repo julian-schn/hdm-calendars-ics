@@ -161,6 +161,28 @@ def parse_date_text(text: str, language: str) -> tuple[date, Optional[date]]:
         y = int(single_de.group(3))
         return date(y, m, d), None
 
+    # Try "DD Month YYYY - DD Month YYYY" range (no dot, EN academic calendar)
+    range_dd_month = re.fullmatch(
+        rf"(\d{{1,2}})\s+{month_pattern}\s+(\d{{4}})\s*-\s*(\d{{1,2}})\s+{month_pattern}\s+(\d{{4}})",
+        text
+    )
+    if range_dd_month:
+        d1 = int(range_dd_month.group(1))
+        m1 = parse_month(range_dd_month.group(2), language)
+        y1 = int(range_dd_month.group(3))
+        d2 = int(range_dd_month.group(4))
+        m2 = parse_month(range_dd_month.group(5), language)
+        y2 = int(range_dd_month.group(6))
+        return date(y1, m1, d1), date(y2, m2, d2)
+
+    # Try "DD Month YYYY" single date (no dot, EN academic calendar)
+    single_dd_month = re.fullmatch(rf"(\d{{1,2}})\s+{month_pattern}\s+(\d{{4}})", text)
+    if single_dd_month:
+        d = int(single_dd_month.group(1))
+        m = parse_month(single_dd_month.group(2), language)
+        y = int(single_dd_month.group(3))
+        return date(y, m, d), None
+
     # Try "Month DD, YYYY - Month DD, YYYY" range (English)
     range_en_full = re.fullmatch(
         rf"{month_pattern}\s+(\d{{1,2}}),?\s+(\d{{4}})\s*-\s*{month_pattern}\s+(\d{{1,2}}),?\s+(\d{{4}})",
@@ -255,6 +277,56 @@ def parse_listing_entry(entry, language: str, base_url: str) -> Optional[Event]:
                 time_start, time_end = parse_time_text(text)
             elif "bi-geo-alt" in icon_classes:
                 location = text
+
+        # Fallback: akademisch calendar uses a different structure
+        # with .calendar-show-date/.calendar-show-time/.calendar-show-location
+        # inside the infos container (spans with bi-calendar-week icons)
+        if date_start is None:
+            infos_container = entry.select_one(".calendar-preview-list-entry-infos")
+            if infos_container:
+                # Date
+                show_date = infos_container.select_one(".calendar-show-date")
+                if show_date:
+                    # The date text is in the second span (first is the icon)
+                    spans = show_date.select("span")
+                    for span in spans:
+                        span_classes = span.get("class", [])
+                        # Skip the icon span
+                        if any("bi" in c for c in span_classes):
+                            continue
+                        text = span.get_text(strip=True)
+                        if text:
+                            try:
+                                date_start, date_end = parse_date_text(text, language)
+                            except ValueError as e:
+                                logger.warning(f"Failed to parse show-date '{text}' for '{title}': {e}")
+                            break
+
+                # Time
+                show_time = infos_container.select_one(".calendar-show-time")
+                if show_time:
+                    spans = show_time.select("span")
+                    for span in spans:
+                        span_classes = span.get("class", [])
+                        if any("bi" in c for c in span_classes):
+                            continue
+                        text = span.get_text(strip=True)
+                        if text:
+                            time_start, time_end = parse_time_text(text)
+                            break
+
+                # Location
+                show_loc = infos_container.select_one(".calendar-show-location")
+                if show_loc:
+                    spans = show_loc.select("span")
+                    for span in spans:
+                        span_classes = span.get("class", [])
+                        if any("bi" in c for c in span_classes):
+                            continue
+                        text = span.get_text(strip=True)
+                        if text:
+                            location = text
+                            break
 
         # Fallback: parse date from the date box if no date found in info fields
         if date_start is None:

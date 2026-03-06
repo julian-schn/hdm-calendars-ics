@@ -7,7 +7,7 @@
     "language": "de",
     "follow_detail_links": true,
     "detail_level": "Detailed",
-    "detail_description": "Events with times, locations, and descriptions"
+    "detail_description": "Events, talks, info sessions, open days (e.g. Agentic AI Day, Girls'Day, Masterinfotag, MediaNight)"
   },
   {
     "name": "HdM Akademischer Kalender",
@@ -17,7 +17,7 @@
     "language": "de",
     "follow_detail_links": false,
     "detail_level": "Overview",
-    "detail_description": "Semester milestones and key dates"
+    "detail_description": "Semester structure: breaks, exam periods, holidays, housing deadlines"
   },
   {
     "name": "HdM Academic Calendar (EN)",
@@ -27,6 +27,6 @@
     "language": "en",
     "follow_detail_links": false,
     "detail_level": "Overview",
-    "detail_description": "Semester milestones and key dates"
+    "detail_description": "Semester structure: breaks, exam periods, holidays, housing deadlines"
   }
 ]

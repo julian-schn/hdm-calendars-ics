@@ -301,6 +301,12 @@ def generate_landing_page(sources: list[dict]) -> str:
             <li>🔗 Just copy the URL below and add it as a calendar subscription</li>
         </ul>
     </div>
+
+    <div class="hint" style="background: #fff8e1; border: 1px solid #ffe082; margin-bottom: 1.5rem;">
+        ⚠️ <strong>Subscribe, don't download!</strong> Use <strong>Copy URL</strong> and add it as a
+        calendar subscription in your app. This way your calendar auto-updates daily with new events.
+        Downloading the file only gives you a one-time snapshot.
+    </div>
     {cards}
 
     <div class="how-to">
