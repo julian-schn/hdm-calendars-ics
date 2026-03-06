@@ -54,6 +54,8 @@ def generate_landing_page(sources: list[dict]) -> str:
         calendar_name = html.escape(source["calendar_name"])
         output_file = html.escape(source["output"])
         output_js = json.dumps(source["output"])
+        copy_label = html.escape(f"Copy subscription URL for {source['calendar_name']}", quote=True)
+        download_label = html.escape(f"Download ICS file for {source['calendar_name']}", quote=True)
 
         rows += f"""
         <tr>
@@ -63,8 +65,8 @@ def generate_landing_page(sources: list[dict]) -> str:
             <td class="subscribe-cell">
                 <div class="sub-actions">
                     <a class="ics-link" href="{output_file}">{output_file}</a>
-                    <button type="button" class="copy-btn" onclick='copyUrl({output_js}, this)'>Copy URL</button>
-                    <a class="download-link" href="{output_file}" download>Download</a>
+                    <button type="button" class="copy-btn" onclick='copyUrl({output_js}, this)' aria-label="{copy_label}">Copy URL</button>
+                    <a class="download-link" href="{output_file}" download aria-label="{download_label}">Download</a>
                 </div>
                 <div class="copy-status" aria-live="polite"></div>
             </td>
@@ -99,6 +101,11 @@ def generate_landing_page(sources: list[dict]) -> str:
         }}
         a {{ color: var(--accent); text-decoration: none; }}
         a:hover {{ text-decoration: underline; }}
+        a:focus-visible, button:focus-visible {{
+            outline: 3px solid #1f6feb;
+            outline-offset: 2px;
+            border-radius: 6px;
+        }}
         h1 {{
             margin: 0 0 0.4rem;
             font-size: 1.6rem;
@@ -113,9 +120,19 @@ def generate_landing_page(sources: list[dict]) -> str:
         .panel {{
             border: 1px solid #e2d5d8;
             border-radius: 10px;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
             background: var(--panel-bg);
             box-shadow: 0 8px 24px rgba(17, 24, 39, 0.05);
+        }}
+        caption {{
+            caption-side: top;
+            text-align: left;
+            padding: 0.75rem;
+            font-weight: 600;
+            color: #2f3b52;
+            background: #f8fbff;
+            border-bottom: 1px solid var(--line);
         }}
         table {{
             width: 100%;
@@ -148,7 +165,7 @@ def generate_landing_page(sources: list[dict]) -> str:
             width: 18rem;
         }}
         .subscribe-cell {{
-            min-width: 18rem;
+            min-width: 0;
         }}
         .sub-actions {{
             display: flex;
@@ -236,6 +253,11 @@ def generate_landing_page(sources: list[dict]) -> str:
         .what-is-this li {{
             margin: 0.25rem 0;
         }}
+        .section-title {{
+            margin: 0;
+            font-size: 1rem;
+            color: #223047;
+        }}
         footer {{
             margin-top: 1rem;
             color: #6f7481;
@@ -247,21 +269,26 @@ def generate_landing_page(sources: list[dict]) -> str:
             td:nth-child(4), th:nth-child(4) {{
                 width: auto;
             }}
+            .sub-actions {{
+                flex-direction: column;
+                align-items: flex-start;
+            }}
         }}
     </style>
 </head>
 <body>
     <h1>HdM Stuttgart Calendars</h1>
     <p class="subtitle">Subscribable ICS calendars generated from <a href="https://www.hdm-stuttgart.de">hdm-stuttgart.de</a>.</p>
-
+    <main>
     <div class="panel">
         <table>
+            <caption>Available HdM calendar subscriptions</caption>
             <thead>
                 <tr>
-                    <th>Calendar</th>
-                    <th>Lang</th>
-                    <th>Coverage</th>
-                    <th>ICS URL</th>
+                    <th scope="col">Calendar</th>
+                    <th scope="col">Lang</th>
+                    <th scope="col">Coverage</th>
+                    <th scope="col">ICS URL</th>
                 </tr>
             </thead>
             <tbody>{rows}
@@ -270,7 +297,7 @@ def generate_landing_page(sources: list[dict]) -> str:
     </div>
 
     <div class="how-to">
-        <strong>How to subscribe</strong>
+        <h2 class="section-title">How to subscribe</h2>
         <ol>
             <li>Copy an ICS URL from the table.</li>
             <li>In your calendar app, choose <em>Add calendar → From URL</em>.</li>
@@ -279,7 +306,7 @@ def generate_landing_page(sources: list[dict]) -> str:
     </div>
 
     <div class="what-is-this">
-        <strong>What is this?</strong>
+        <h2 class="section-title">What is this?</h2>
         <p>These are auto-generated ICS feeds from official HdM calendar pages.</p>
         <ul>
             <li><strong>Subscribe by URL</strong> to get daily updates automatically.</li>
@@ -287,6 +314,7 @@ def generate_landing_page(sources: list[dict]) -> str:
             <li>Use download only for one-off import, offline use, or archiving.</li>
         </ul>
     </div>
+    </main>
 
     <footer>
         Updated daily at 06:00 UTC via GitHub Actions ·

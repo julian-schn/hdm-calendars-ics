@@ -27,6 +27,11 @@
         }
         a { color: var(--accent); text-decoration: none; }
         a:hover { text-decoration: underline; }
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid #1f6feb;
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
         h1 {
             margin: 0 0 0.4rem;
             font-size: 1.6rem;
@@ -41,9 +46,19 @@
         .panel {
             border: 1px solid #e2d5d8;
             border-radius: 10px;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
             background: var(--panel-bg);
             box-shadow: 0 8px 24px rgba(17, 24, 39, 0.05);
+        }
+        caption {
+            caption-side: top;
+            text-align: left;
+            padding: 0.75rem;
+            font-weight: 600;
+            color: #2f3b52;
+            background: #f8fbff;
+            border-bottom: 1px solid var(--line);
         }
         table {
             width: 100%;
@@ -76,7 +91,7 @@
             width: 18rem;
         }
         .subscribe-cell {
-            min-width: 18rem;
+            min-width: 0;
         }
         .sub-actions {
             display: flex;
@@ -164,6 +179,11 @@
         .what-is-this li {
             margin: 0.25rem 0;
         }
+        .section-title {
+            margin: 0;
+            font-size: 1rem;
+            color: #223047;
+        }
         footer {
             margin-top: 1rem;
             color: #6f7481;
@@ -175,21 +195,26 @@
             td:nth-child(4), th:nth-child(4) {
                 width: auto;
             }
+            .sub-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
     <h1>HdM Stuttgart Calendars</h1>
     <p class="subtitle">Subscribable ICS calendars generated from <a href="https://www.hdm-stuttgart.de">hdm-stuttgart.de</a>.</p>
-
+    <main>
     <div class="panel">
         <table>
+            <caption>Available HdM calendar subscriptions</caption>
             <thead>
                 <tr>
-                    <th>Calendar</th>
-                    <th>Lang</th>
-                    <th>Coverage</th>
-                    <th>ICS URL</th>
+                    <th scope="col">Calendar</th>
+                    <th scope="col">Lang</th>
+                    <th scope="col">Coverage</th>
+                    <th scope="col">ICS URL</th>
                 </tr>
             </thead>
             <tbody>
@@ -200,8 +225,8 @@
             <td class="subscribe-cell">
                 <div class="sub-actions">
                     <a class="ics-link" href="hdm-termine.ics">hdm-termine.ics</a>
-                    <button type="button" class="copy-btn" onclick='copyUrl("hdm-termine.ics", this)'>Copy URL</button>
-                    <a class="download-link" href="hdm-termine.ics" download>Download</a>
+                    <button type="button" class="copy-btn" onclick='copyUrl("hdm-termine.ics", this)' aria-label="Copy subscription URL for HdM Termine">Copy URL</button>
+                    <a class="download-link" href="hdm-termine.ics" download aria-label="Download ICS file for HdM Termine">Download</a>
                 </div>
                 <div class="copy-status" aria-live="polite"></div>
             </td>
@@ -213,8 +238,8 @@
             <td class="subscribe-cell">
                 <div class="sub-actions">
                     <a class="ics-link" href="hdm-akademisch.ics">hdm-akademisch.ics</a>
-                    <button type="button" class="copy-btn" onclick='copyUrl("hdm-akademisch.ics", this)'>Copy URL</button>
-                    <a class="download-link" href="hdm-akademisch.ics" download>Download</a>
+                    <button type="button" class="copy-btn" onclick='copyUrl("hdm-akademisch.ics", this)' aria-label="Copy subscription URL for HdM Akademischer Kalender">Copy URL</button>
+                    <a class="download-link" href="hdm-akademisch.ics" download aria-label="Download ICS file for HdM Akademischer Kalender">Download</a>
                 </div>
                 <div class="copy-status" aria-live="polite"></div>
             </td>
@@ -226,8 +251,8 @@
             <td class="subscribe-cell">
                 <div class="sub-actions">
                     <a class="ics-link" href="hdm-academic-en.ics">hdm-academic-en.ics</a>
-                    <button type="button" class="copy-btn" onclick='copyUrl("hdm-academic-en.ics", this)'>Copy URL</button>
-                    <a class="download-link" href="hdm-academic-en.ics" download>Download</a>
+                    <button type="button" class="copy-btn" onclick='copyUrl("hdm-academic-en.ics", this)' aria-label="Copy subscription URL for HdM Academic Calendar">Copy URL</button>
+                    <a class="download-link" href="hdm-academic-en.ics" download aria-label="Download ICS file for HdM Academic Calendar">Download</a>
                 </div>
                 <div class="copy-status" aria-live="polite"></div>
             </td>
@@ -237,7 +262,7 @@
     </div>
 
     <div class="how-to">
-        <strong>How to subscribe</strong>
+        <h2 class="section-title">How to subscribe</h2>
         <ol>
             <li>Copy an ICS URL from the table.</li>
             <li>In your calendar app, choose <em>Add calendar → From URL</em>.</li>
@@ -246,7 +271,7 @@
     </div>
 
     <div class="what-is-this">
-        <strong>What is this?</strong>
+        <h2 class="section-title">What is this?</h2>
         <p>These are auto-generated ICS feeds from official HdM calendar pages.</p>
         <ul>
             <li><strong>Subscribe by URL</strong> to get daily updates automatically.</li>
@@ -254,6 +279,7 @@
             <li>Use download only for one-off import, offline use, or archiving.</li>
         </ul>
     </div>
+    </main>
 
     <footer>
         Updated daily at 06:00 UTC via GitHub Actions ·
