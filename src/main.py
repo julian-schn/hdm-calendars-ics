@@ -6,6 +6,7 @@ Reads source configurations, crawls each calendar page,
 generates ICS files, and writes them to the output directory.
 """
 
+import html
 import json
 import logging
 import sys
@@ -43,41 +44,31 @@ def load_sources() -> list[dict]:
 
 
 def generate_landing_page(sources: list[dict]) -> str:
-    """Generate an HTML landing page with calendar cards, copy buttons, and responsive layout."""
-    cards = ""
+    """Generate a simple, consistent HTML landing page for calendar subscriptions."""
+    rows = ""
     for source in sources:
-        lang = "🇩🇪 DE" if source["language"] == "de" else "🇬🇧 EN"
-        level = source.get("detail_level", "")
-        level_desc = source.get("detail_description", "")
-        badge_class = "badge-detailed" if level == "Detailed" else "badge-overview"
-        cards += f"""
-        <div class="card">
-            <div class="card-header">
-                <h2>{source['calendar_name']}</h2>
-                <div class="card-badges">
-                    <span class="badge {badge_class}">{level}</span>
-                    <span class="badge badge-lang">{lang}</span>
+        language = "DE" if source["language"] == "de" else "EN"
+        level = html.escape(source.get("detail_level", "Standard"))
+        description = html.escape(source.get("detail_description", ""))
+        coverage = level if not description else f"{level}: {description}"
+        calendar_name = html.escape(source["calendar_name"])
+        output_file = html.escape(source["output"])
+        output_js = json.dumps(source["output"])
+
+        rows += f"""
+        <tr>
+            <td>{calendar_name}</td>
+            <td>{language}</td>
+            <td>{coverage}</td>
+            <td class="subscribe-cell">
+                <div class="sub-actions">
+                    <a class="ics-link" href="{output_file}">{output_file}</a>
+                    <button type="button" class="copy-btn" onclick='copyUrl({output_js}, this)'>Copy URL</button>
+                    <a class="download-link" href="{output_file}" download>Download</a>
                 </div>
-            </div>
-            <p class="card-desc">{level_desc}</p>
-            <div class="url-row">
-                <code class="url-display" id="url-{source['output']}">{source['output']}</code>
-                <a class="dl-btn" href="{source['output']}" download title="Download .ics file">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M2.75 14A1.75 1.75 0 011 12.25v-2.5a.75.75 0 011.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25v-2.5a.75.75 0 011.5 0v2.5A1.75 1.75 0 0113.25 14z"/>
-                        <path d="M7.25 7.689V2a.75.75 0 011.5 0v5.689l1.97-1.969a.749.749 0 111.06 1.06l-3.25 3.25a.749.749 0 01-1.06 0L4.22 6.78a.749.749 0 111.06-1.06z"/>
-                    </svg>
-                    <span class="dl-label">Download</span>
-                </a>
-                <button class="copy-btn" onclick="copyUrl('{source['output']}')" title="Copy subscribe URL">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25z"/>
-                        <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25z"/>
-                    </svg>
-                    <span class="copy-label">Copy URL</span>
-                </button>
-            </div>
-        </div>"""
+                <div class="copy-status" aria-live="polite"></div>
+            </td>
+        </tr>"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -87,255 +78,205 @@ def generate_landing_page(sources: list[dict]) -> str:
     <title>HdM Calendars – ICS Subscribe</title>
     <meta name="description" content="Subscribe to HdM Stuttgart calendar events as ICS webcalendars. Auto-updated daily.">
     <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        * {{ box-sizing: border-box; }}
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 740px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 2rem 1rem;
             color: #1a1a1a;
-            line-height: 1.6;
-            background: #fafafa;
+            line-height: 1.5;
+            background: #ffffff;
         }}
-
-        header {{
-            margin-bottom: 2rem;
-        }}
+        a {{ color: #b00014; text-decoration: none; }}
+        a:hover {{ text-decoration: underline; }}
         h1 {{
-            font-size: 1.75rem;
-            margin-bottom: 0.25rem;
+            margin: 0 0 0.4rem;
+            font-size: 1.6rem;
         }}
-        header p {{
+        p.subtitle {{
+            margin: 0 0 1.25rem;
             color: #555;
             font-size: 0.95rem;
         }}
-
-        /* --- About section --- */
-        .about {{
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 10px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            color: #444;
-        }}
-        .about strong {{ color: #1a1a1a; }}
-        .about ul {{
-            margin: 0.5rem 0 0 1.25rem;
-            padding: 0;
-        }}
-        .about li {{ margin-bottom: 0.2rem; }}
-
-        /* --- Cards --- */
-        .card {{
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 10px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1rem;
-            transition: box-shadow 0.15s;
-        }}
-        .card:hover {{
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        }}
-        .card-header {{
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }}
-        .card-header h2 {{
-            font-size: 1.1rem;
-            font-weight: 600;
-        }}
-        .card-badges {{
-            display: flex;
-            gap: 0.4rem;
-            flex-shrink: 0;
-        }}
-        .badge {{
-            display: inline-block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.2em 0.6em;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            white-space: nowrap;
-        }}
-        .badge-detailed {{
-            background: #e8f5e9;
-            color: #2e7d32;
-        }}
-        .badge-overview {{
-            background: #e3f2fd;
-            color: #1565c0;
-        }}
-        .badge-lang {{
-            background: #f5f5f5;
-            color: #666;
-        }}
-        .card-desc {{
-            font-size: 0.85rem;
-            color: #777;
-            margin: 0.4rem 0 0.75rem;
-        }}
-
-        /* --- URL row --- */
-        .url-row {{
-            display: flex;
-            align-items: stretch;
-            gap: 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+        .panel {{
+            border: 1px solid #e3e3e3;
+            border-radius: 8px;
             overflow: hidden;
+            background: #fff;
         }}
-        .url-display {{
-            flex: 1;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.8rem;
-            background: #f9f9f9;
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+        }}
+        th, td {{
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid #ededed;
+            vertical-align: top;
+            font-size: 0.92rem;
+        }}
+        th {{
+            background: #f6f6f6;
+            font-weight: 600;
             color: #333;
-            overflow-x: auto;
+        }}
+        td:nth-child(2), th:nth-child(2) {{
+            width: 4rem;
             white-space: nowrap;
-            border: none;
+        }}
+        td:nth-child(4), th:nth-child(4) {{
+            width: 18rem;
+        }}
+        .subscribe-cell {{
+            min-width: 18rem;
+        }}
+        .sub-actions {{
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }}
+        .ics-link {{
+            word-break: break-all;
+        }}
+        .copy-btn, .download-link {{
+            border: 1px solid #d0d0d0;
+            border-radius: 6px;
+            padding: 0.3rem 0.55rem;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            background: #fff;
+            color: #333;
+            text-decoration: none;
         }}
         .copy-btn {{
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.5rem 0.85rem;
-            background: #e2001a;
-            color: #fff;
-            border: none;
             cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            transition: background 0.15s;
-            white-space: nowrap;
         }}
-        .copy-btn:hover {{
-            background: #b80015;
+        .copy-btn:hover, .download-link:hover {{
+            background: #f3f3f3;
+            text-decoration: none;
         }}
         .copy-btn.copied {{
-            background: #2e7d32;
+            border-color: #2e7d32;
+            color: #2e7d32;
         }}
-
-        .dl-btn {{
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.5rem 0.85rem;
-            background: #f5f5f5;
-            color: #333;
-            border: none;
-            border-left: 1px solid #ddd;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background 0.15s;
-            white-space: nowrap;
+        .copy-status {{
+            margin-top: 0.35rem;
+            font-size: 0.78rem;
+            color: #666;
         }}
-        .dl-btn:hover {{
-            background: #e8e8e8;
-            text-decoration: none;
+        tr:last-child td {{
+            border-bottom: none;
         }}
-
-        /* --- How-to --- */
         .how-to {{
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 10px;
-            padding: 1rem 1.5rem;
-            margin-top: 1.5rem;
-            font-size: 0.88rem;
-            color: #444;
+            margin-top: 1rem;
+            padding: 0.9rem 1rem;
+            background: #f8fbff;
+            border: 1px solid #dbe8f4;
+            border-radius: 8px;
+            font-size: 0.9rem;
         }}
-        .how-to strong {{ color: #1a1a1a; }}
         .how-to ol {{
-            margin: 0.5rem 0 0 1.25rem;
+            margin: 0.5rem 0 0 1.2rem;
             padding: 0;
         }}
-        .how-to li {{ margin-bottom: 0.2rem; }}
-
-        footer {{
-            margin-top: 2rem;
-            font-size: 0.78rem;
-            color: #aaa;
-            text-align: center;
+        .how-to li {{
+            margin: 0.25rem 0;
         }}
-        footer a {{ color: #888; }}
-
-        a {{ color: #e2001a; text-decoration: none; }}
-        a:hover {{ text-decoration: underline; }}
-
-        /* --- Mobile --- */
-        @media (max-width: 500px) {{
-            body {{ padding: 1rem 0.75rem; }}
-            h1 {{ font-size: 1.4rem; }}
-            .card {{ padding: 1rem; }}
-            .card-header {{ flex-direction: column; gap: 0.4rem; }}
-            .copy-label, .dl-label {{ display: none; }}
-            .copy-btn, .dl-btn {{ padding: 0.5rem 0.65rem; }}
+        .what-is-this {{
+            margin-top: 1rem;
+            padding: 0.9rem 1rem;
+            background: #fafafa;
+            border: 1px solid #e4e4e4;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }}
+        .what-is-this p {{
+            margin: 0.4rem 0 0;
+            color: #555;
+        }}
+        .what-is-this ul {{
+            margin: 0.55rem 0 0 1.2rem;
+            padding: 0;
+        }}
+        .what-is-this li {{
+            margin: 0.25rem 0;
+        }}
+        footer {{
+            margin-top: 1rem;
+            color: #888;
+            font-size: 0.8rem;
+        }}
+        @media (max-width: 760px) {{
+            td:nth-child(4), th:nth-child(4) {{
+                width: auto;
+            }}
         }}
     </style>
 </head>
 <body>
-    <header>
-        <h1>📅 HdM Stuttgart Calendars</h1>
-        <p>Subscribable webcalendars from <a href="https://www.hdm-stuttgart.de">hdm-stuttgart.de</a></p>
-    </header>
+    <h1>HdM Stuttgart Calendars</h1>
+    <p class="subtitle">Subscribable ICS calendars generated from <a href="https://www.hdm-stuttgart.de">hdm-stuttgart.de</a>.</p>
 
-    <div class="about">
-        <strong>What is this?</strong> This page provides subscribable calendar files (.ics) generated
-        automatically from the official HdM Stuttgart calendar pages. Once you subscribe, your calendar
-        app will always stay up-to-date.
-        <ul>
-            <li>🔄 <strong>Auto-refreshes daily</strong> at 06:00 UTC via GitHub Actions</li>
-            <li>📆 Works with Google Calendar, Apple Calendar, Outlook, and any app that supports ICS</li>
-            <li>🔗 Just copy the URL below and add it as a calendar subscription</li>
-        </ul>
+    <div class="panel">
+        <table>
+            <thead>
+                <tr>
+                    <th>Calendar</th>
+                    <th>Lang</th>
+                    <th>Coverage</th>
+                    <th>ICS URL</th>
+                </tr>
+            </thead>
+            <tbody>{rows}
+            </tbody>
+        </table>
     </div>
-
-    <div class="hint" style="background: #fff8e1; border: 1px solid #ffe082; margin-bottom: 1.5rem;">
-        ⚠️ <strong>Subscribe, don't download!</strong> Use <strong>Copy URL</strong> and add it as a
-        calendar subscription in your app. This way your calendar auto-updates daily with new events.
-        Downloading the file only gives you a one-time snapshot.
-    </div>
-    {cards}
 
     <div class="how-to">
-        <strong>How to subscribe:</strong>
+        <strong>How to subscribe</strong>
         <ol>
-            <li>Click <strong>Copy</strong> next to the calendar you want</li>
-            <li>Open your calendar app (Google Calendar, Apple Calendar, Outlook, …)</li>
-            <li>Choose <em>"Add calendar → From URL"</em> and paste the link</li>
-            <li>Done — the calendar will auto-update daily</li>
+            <li>Copy an ICS URL from the table.</li>
+            <li>In your calendar app, choose <em>Add calendar → From URL</em>.</li>
+            <li>Paste the URL to keep events automatically up to date.</li>
         </ol>
     </div>
 
+    <div class="what-is-this">
+        <strong>What is this?</strong>
+        <p>These are auto-generated ICS feeds from official HdM calendar pages.</p>
+        <ul>
+            <li><strong>Subscribe by URL</strong> to get daily updates automatically.</li>
+            <li><strong>Download</strong> is only a one-time snapshot that does not sync future changes.</li>
+            <li>Use download only for one-off import, offline use, or archiving.</li>
+        </ul>
+    </div>
+
     <footer>
-        Auto-updated daily via GitHub Actions ·
-        <a href="https://github.com/julian-schn/hdm-calendars-ics">Source on GitHub</a>
+        Updated daily at 06:00 UTC via GitHub Actions ·
+        <a href="https://schniepp.dev">Maintained by Julian Schniepp</a> ·
+        <a href="https://github.com/julian-schn/hdm-calendars-ics">Source</a>
     </footer>
 
     <script>
-    function copyUrl(filename) {{
-        const fullUrl = window.location.href.replace(/\\/[^/]*$/, '/') + filename;
+    function copyUrl(filename, button) {{
+        const pageUrl = window.location.href.replace(/\\/[^/]*$/, '/');
+        const fullUrl = new URL(filename, pageUrl).toString();
+        const status = button.closest('.subscribe-cell').querySelector('.copy-status');
+        const originalLabel = button.dataset.label || button.textContent;
+        button.dataset.label = originalLabel;
+
         navigator.clipboard.writeText(fullUrl).then(() => {{
-            const btn = event.currentTarget;
-            const label = btn.querySelector('.copy-label');
-            btn.classList.add('copied');
-            if (label) label.textContent = 'Copied!';
+            button.textContent = 'Copied';
+            button.classList.add('copied');
+            if (status) status.textContent = fullUrl;
             setTimeout(() => {{
-                btn.classList.remove('copied');
-                if (label) label.textContent = 'Copy';
-            }}, 2000);
+                button.textContent = originalLabel;
+                button.classList.remove('copied');
+            }}, 1800);
+        }}).catch(() => {{
+            if (status) status.textContent = 'Copy failed. Please copy the URL manually.';
         }});
     }}
     </script>
