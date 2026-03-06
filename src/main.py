@@ -317,7 +317,7 @@ def generate_landing_page(sources: list[dict]) -> str:
     </main>
 
     <footer>
-        Updated daily at 06:00 UTC via GitHub Actions ·
+        Updated twice daily at 05:00 and 18:00 CET via GitHub Actions ·
         <a href="https://schniepp.dev">Maintained by Julian Schniepp</a> ·
         <a href="https://github.com/julian-schn/hdm-calendars-ics">Source</a>
     </footer>

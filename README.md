@@ -16,7 +16,7 @@ Automatically crawls [HdM Stuttgart](https://www.hdm-stuttgart.de) calendar page
 
 ## How It Works
 
-1. **GitHub Actions** runs a scheduled workflow daily at 06:00 UTC
+1. **GitHub Actions** runs scheduled workflows twice daily at 05:00 and 18:00 CET
 2. A Python script crawls the HdM calendar webpages
 3. Events are parsed and converted to `.ics` (iCalendar) format
 4. The `.ics` files are deployed to **GitHub Pages**

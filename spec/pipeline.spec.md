@@ -4,7 +4,7 @@
 Orchestrate the crawl → generate → output flow for all configured calendar sources.
 
 ## Trigger
-- **Scheduled:** Daily at 06:00 UTC via GitHub Actions cron
+- **Scheduled:** Twice daily at 05:00 and 18:00 CET via GitHub Actions cron
 - **Manual:** `workflow_dispatch` from GitHub Actions UI
 - **On push:** Any push to `main` branch (for development/testing)
 
