@@ -2,7 +2,7 @@
 
 [![Build & Deploy](https://github.com/julian-schn/hdm-calendars-ics/actions/workflows/build.yml/badge.svg)](https://github.com/julian-schn/hdm-calendars-ics/actions/workflows/build.yml)
 
-Automatically crawls [HdM Stuttgart](https://www.hdm-stuttgart.de) calendar pages daily and publishes subscribable `.ics` webcalendars via GitHub Pages.
+Automatically crawls [HdM Stuttgart](https://www.hdm-stuttgart.de) calendar pages twice daily and publishes subscribable `.ics` webcalendars via GitHub Pages.
 
 ## 📅 Subscribe
 
@@ -20,7 +20,7 @@ Automatically crawls [HdM Stuttgart](https://www.hdm-stuttgart.de) calendar page
 2. A Python script crawls the HdM calendar webpages
 3. Events are parsed and converted to `.ics` (iCalendar) format
 4. The `.ics` files are deployed to **GitHub Pages**
-5. Anyone can subscribe to the calendar URL — it auto-updates daily
+5. Anyone can subscribe to the calendar URL — it auto-updates twice daily
 
 ## Sources
 
@@ -44,7 +44,7 @@ This project uses **spec-driven development**. Behavior specifications live in [
 pip install -r requirements.txt
 
 # Run the pipeline
-python src/main.py
+python3 src/main.py
 
 # Output is written to dist/
 ls dist/*.ics
@@ -60,6 +60,7 @@ ls dist/*.ics
 │   ├── crawl.py                   # HTML → structured events
 │   ├── generate_ics.py            # Events → ICS file
 │   └── main.py                    # Orchestrator
+├── tests/                         # Focused parser and ICS regression tests
 ├── dist/                          # Generated output (deployed to Pages)
 └── requirements.txt
 ```
