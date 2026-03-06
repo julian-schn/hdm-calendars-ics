@@ -5,7 +5,9 @@
     "output": "hdm-termine.ics",
     "calendar_name": "HdM Termine",
     "language": "de",
-    "follow_detail_links": true
+    "follow_detail_links": true,
+    "detail_level": "Detailed",
+    "detail_description": "Events with times, locations, and descriptions"
   },
   {
     "name": "HdM Akademischer Kalender",
@@ -13,7 +15,9 @@
     "output": "hdm-akademisch.ics",
     "calendar_name": "HdM Akademischer Kalender",
     "language": "de",
-    "follow_detail_links": false
+    "follow_detail_links": false,
+    "detail_level": "Overview",
+    "detail_description": "Semester milestones and key dates"
   },
   {
     "name": "HdM Academic Calendar (EN)",
@@ -21,6 +25,8 @@
     "output": "hdm-academic-en.ics",
     "calendar_name": "HdM Academic Calendar",
     "language": "en",
-    "follow_detail_links": false
+    "follow_detail_links": false,
+    "detail_level": "Overview",
+    "detail_description": "Semester milestones and key dates"
   }
 ]
