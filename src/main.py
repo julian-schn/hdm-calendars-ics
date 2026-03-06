@@ -78,32 +78,44 @@ def generate_landing_page(sources: list[dict]) -> str:
     <title>HdM Calendars – ICS Subscribe</title>
     <meta name="description" content="Subscribe to HdM Stuttgart calendar events as ICS webcalendars. Auto-updated daily.">
     <style>
+        :root {{
+            --accent: #b00014;
+            --accent-strong: #8a0010;
+            --accent-soft: #fdecef;
+            --text: #1a1a1a;
+            --muted: #555;
+            --line: #e6e8ee;
+            --panel-bg: #ffffff;
+        }}
         * {{ box-sizing: border-box; }}
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 900px;
             margin: 0 auto;
             padding: 2rem 1rem;
-            color: #1a1a1a;
+            color: var(--text);
             line-height: 1.5;
-            background: #ffffff;
+            background: linear-gradient(180deg, #f6f8fc 0%, #ffffff 45%);
         }}
-        a {{ color: #b00014; text-decoration: none; }}
+        a {{ color: var(--accent); text-decoration: none; }}
         a:hover {{ text-decoration: underline; }}
         h1 {{
             margin: 0 0 0.4rem;
             font-size: 1.6rem;
+            color: var(--accent-strong);
+            letter-spacing: 0.01em;
         }}
         p.subtitle {{
             margin: 0 0 1.25rem;
-            color: #555;
+            color: var(--muted);
             font-size: 0.95rem;
         }}
         .panel {{
-            border: 1px solid #e3e3e3;
-            border-radius: 8px;
+            border: 1px solid #e2d5d8;
+            border-radius: 10px;
             overflow: hidden;
-            background: #fff;
+            background: var(--panel-bg);
+            box-shadow: 0 8px 24px rgba(17, 24, 39, 0.05);
         }}
         table {{
             width: 100%;
@@ -112,18 +124,25 @@ def generate_landing_page(sources: list[dict]) -> str:
         th, td {{
             text-align: left;
             padding: 0.75rem;
-            border-bottom: 1px solid #ededed;
+            border-bottom: 1px solid var(--line);
             vertical-align: top;
             font-size: 0.92rem;
         }}
         th {{
-            background: #f6f6f6;
+            background: #fff4f6;
             font-weight: 600;
-            color: #333;
+            color: #3a1c21;
+        }}
+        tbody tr:nth-child(even) {{
+            background: #fcfcfd;
+        }}
+        tbody tr:hover {{
+            background: #f7f9ff;
         }}
         td:nth-child(2), th:nth-child(2) {{
             width: 4rem;
             white-space: nowrap;
+            font-weight: 600;
         }}
         td:nth-child(4), th:nth-child(4) {{
             width: 18rem;
@@ -141,7 +160,7 @@ def generate_landing_page(sources: list[dict]) -> str:
             word-break: break-all;
         }}
         .copy-btn, .download-link {{
-            border: 1px solid #d0d0d0;
+            border: 1px solid #d8dbe3;
             border-radius: 6px;
             padding: 0.3rem 0.55rem;
             font-size: 0.8rem;
@@ -149,17 +168,29 @@ def generate_landing_page(sources: list[dict]) -> str:
             background: #fff;
             color: #333;
             text-decoration: none;
+            transition: transform 0.05s ease, background 0.2s ease, border-color 0.2s ease;
         }}
         .copy-btn {{
             cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
         }}
         .copy-btn:hover, .download-link:hover {{
             background: #f3f3f3;
             text-decoration: none;
         }}
+        .copy-btn:hover {{
+            background: var(--accent-strong);
+            border-color: var(--accent-strong);
+        }}
+        .copy-btn:active, .download-link:active {{
+            transform: translateY(1px);
+        }}
         .copy-btn.copied {{
             border-color: #2e7d32;
-            color: #2e7d32;
+            background: #2e7d32;
+            color: #fff;
         }}
         .copy-status {{
             margin-top: 0.35rem;
@@ -172,8 +203,9 @@ def generate_landing_page(sources: list[dict]) -> str:
         .how-to {{
             margin-top: 1rem;
             padding: 0.9rem 1rem;
-            background: #f8fbff;
-            border: 1px solid #dbe8f4;
+            background: #f7fbff;
+            border: 1px solid #d7e7f8;
+            border-left: 4px solid #5d8fd3;
             border-radius: 8px;
             font-size: 0.9rem;
         }}
@@ -187,8 +219,9 @@ def generate_landing_page(sources: list[dict]) -> str:
         .what-is-this {{
             margin-top: 1rem;
             padding: 0.9rem 1rem;
-            background: #fafafa;
-            border: 1px solid #e4e4e4;
+            background: #fff8f8;
+            border: 1px solid #f1dadd;
+            border-left: 4px solid var(--accent);
             border-radius: 8px;
             font-size: 0.9rem;
         }}
@@ -205,8 +238,10 @@ def generate_landing_page(sources: list[dict]) -> str:
         }}
         footer {{
             margin-top: 1rem;
-            color: #888;
+            color: #6f7481;
             font-size: 0.8rem;
+            border-top: 1px solid var(--line);
+            padding-top: 0.8rem;
         }}
         @media (max-width: 760px) {{
             td:nth-child(4), th:nth-child(4) {{
